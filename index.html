@@ -17,6 +17,7 @@ header{display:flex;justify-content:space-between;align-items:center;margin-bott
 .login{position:fixed;inset:0;background:rgba(10,12,20,.55);display:grid;place-items:center;padding:20px}.loginbox{width:min(410px,100%);padding:28px}.loginbox h1{margin:0 0 7px}.loginbox p{color:var(--muted);margin-top:0}.field{margin:13px 0}.field label{font-size:13px;font-weight:700}.field input,.field select{width:100%;padding:13px;border:1px solid var(--line);border-radius:12px;outline:none;margin-top:6px;background:#fff}.primary{width:100%;padding:13px;border-radius:12px;background:var(--primary);color:#fff;font-weight:800}.demo{text-align:center;color:var(--muted);font-size:12px;margin-top:12px}
 .modal{position:fixed;inset:0;background:rgba(10,12,20,.5);display:none;place-items:center;padding:20px}.modal.show{display:grid}.modalbox{width:min(470px,100%);padding:25px}.modalhead{display:flex;justify-content:space-between}.close{background:#f1f2f6;width:35px;height:35px;border-radius:50%}
 @media(max-width:760px){.app{padding:15px}.grid{grid-template-columns:1fr}.amount{font-size:32px}.panel{padding:18px}}
+[hidden]{display:none !important}
 </style>
 </head>
 <body>
@@ -63,7 +64,7 @@ function money(n){return new Intl.NumberFormat('th-TH',{style:'currency',currenc
 function login(){const email=document.getElementById('email').value.trim();if(!email)return alert('กรุณาใส่อีเมล');state.user={email,name:email.split('@')[0]||'ผู้ใช้งาน'};save();show()}
 function logout(){state.user=null;save();show()}
 function save(){localStorage.setItem(KEY,JSON.stringify(state))}
-function show(){document.getElementById('login').hidden=!!state.user;document.getElementById('app').hidden=!state.user;if(state.user){userName.textContent=state.user.name;avatar.textContent=state.user.name[0]?.toUpperCase()||'U';render()}}
+function show(){const loginBox=document.getElementById('login');const app=document.getElementById('app');const loggedIn=!!state.user;loginBox.hidden=loggedIn;app.hidden=!loggedIn;loginBox.style.display=loggedIn?'none':'grid';app.style.display=loggedIn?'block':'none';if(state.user){userName.textContent=state.user.name;avatar.textContent=state.user.name[0]?.toUpperCase()||'U';render()}}
 function render(){let inc=state.items.filter(x=>x.type==='income').reduce((a,x)=>a+x.amount,0),out=state.items.filter(x=>x.type==='expense').reduce((a,x)=>a+x.amount,0);balance.textContent=money(inc-out);income.textContent=money(inc);expense.textContent=money(out);count.textContent=state.items.length;
 let cats={};state.items.filter(x=>x.type==='expense').forEach(x=>cats[x.category]=(cats[x.category]||0)+x.amount);let top=Object.entries(cats).sort((a,b)=>b[1]-a[1])[0];topCat.textContent=top?top[0]:'—';
 transactions.innerHTML=state.items.slice(-8).reverse().map(x=>`<div class="tx"><div class="icon">${x.type==='income'?'💰':'🧾'}</div><div class="tx-main"><b>${esc(x.note||x.category)}</b><small>${esc(x.category)} • ${x.date}</small></div><div class="money ${x.type==='income'?'in':'out'}">${x.type==='income'?'+':'−'}${money(x.amount)}</div></div>`).join('')||'<p style="color:var(--muted)">ยังไม่มีรายการ ลองเพิ่มรายการแรกกันเลย</p>'}
