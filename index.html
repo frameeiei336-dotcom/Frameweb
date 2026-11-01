@@ -71,6 +71,12 @@
     .secondary { background:linear-gradient(110deg,var(--blue-deep),#91c9ed); }
     .tiny { font-size:11px; color:#b49eb3; margin-top:25px; }
     #noButton { position:relative; z-index:5; touch-action:manipulation; }
+    #dodgeMessage { position:fixed; z-index:20; left:50%; top:18px; transform:translateX(-50%);
+      width:min(90vw,360px); padding:12px 16px !important; border-radius:18px;
+      background:rgba(255,255,255,.96) !important; border:1px solid #f5cfe0;
+      box-shadow:0 8px 24px rgba(140,105,150,.18) !important; text-align:center;
+      font-size:14px; animation:toastIn .22s ease both; }
+    @keyframes toastIn { from { opacity:0; transform:translate(-50%,-8px) } to { opacity:1; transform:translate(-50%,0) } }
     #noButton.running { position:fixed; transition:left .18s ease, top .18s ease, transform .18s ease; }
     .progress { display:flex; justify-content:center; gap:6px; margin:0 0 18px; }
     .progress i { width:6px;height:6px;border-radius:50%;background:#ead5e5; }
@@ -141,7 +147,9 @@
       <p id="dodgeMessage" class="sub" aria-live="polite" style="display:none;max-width:310px;margin:0 auto 12px;padding:9px 13px;border-radius:18px;background:linear-gradient(120deg,#fff0f6,#edf8ff);color:#9b718f;box-shadow:0 4px 12px rgba(185,145,180,.10)">อ้าว~ ปุ่มมันหนีเองนะ ไม่เกี่ยวกับเราเลย 🙈</p>
       <div class="buttons">
         <button class="primary" onclick="go(4)">ลองกลับมาคุยกันนะ 💗</button>
-        <button class="secondary" id="noButton" type="button" onmouseenter="dodgeNoButton()" ontouchstart="dodgeNoButton(event)" onclick="dodgeNoButton(event)">ขอคิดดูก่อน</button>
+        <button class="secondary" id="noButton" type="button" onpointerenter="if (event.pointerType === 'mouse') dodgeNoButton(event)"
+        onpointerdown="if (event.pointerType !== 'mouse') dodgeNoButton(event)"
+        onclick="if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) dodgeNoButton(event)" >ขอคิดดูก่อน</button>
       </div>
     </section>
 
@@ -218,6 +226,9 @@
       if (bubble) {
         bubble.style.display = 'block';
         bubble.textContent = dodgeLines[Math.min(dodgeCount, dodgeLines.length - 1)];
+        bubble.style.animation = 'none';
+        void bubble.offsetWidth;
+        bubble.style.animation = 'toastIn .22s ease both';
       }
       dodgeCount++;
 
