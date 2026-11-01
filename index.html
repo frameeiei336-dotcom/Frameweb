@@ -140,6 +140,51 @@
     }
     .seal { position:absolute;z-index:2;left:calc(50% - 14px);top:42px;font-size:27px; }
     @media(max-width:380px){.card{padding:24px 18px;min-height:560px}.art{width:165px;height:160px}}
+
+    /* ปุ่มหน้าสุดท้าย: ทรงแคปซูลนุ่ม ๆ และลอยเบา ๆ */
+    #page4 .replay-button {
+      min-width: min(270px, 82vw);
+      min-height: 58px;
+      padding: 15px 30px;
+      border-radius: 999px;
+      font-size: 1.25em;
+      font-weight: 700;
+      color: #bd718f;
+      background: linear-gradient(180deg,#fffafd 0%,#ffeaf2 100%);
+      border: 1px solid #f3cbd9;
+      box-shadow: 0 7px 0 #f1c6d6, 0 12px 24px rgba(205,145,174,.18);
+      animation: replayFloat 2.6s ease-in-out infinite;
+      transition: transform .18s ease, box-shadow .18s ease;
+    }
+    #page4 .replay-button:active {
+      transform: translateY(4px) scale(.98);
+      box-shadow: 0 3px 0 #f1c6d6, 0 6px 12px rgba(205,145,174,.14);
+    }
+    #page4 .final-actions { margin: 20px 0 14px; }
+    #page4 .screenshot-hint {
+      display:inline-block;
+      margin: 8px auto 0;
+      padding: 12px 20px;
+      border-radius: 18px;
+      color:#7796bd;
+      background:linear-gradient(135deg,#eef8ff,#e6f2ff);
+      box-shadow:0 5px 16px rgba(130,170,210,.12);
+      font-size: .95em;
+      line-height:1.6;
+      animation: hintFloat 3.2s ease-in-out infinite;
+    }
+    @keyframes replayFloat {
+      0%,100% { transform:translateY(0); }
+      50% { transform:translateY(-5px); }
+    }
+    @keyframes hintFloat {
+      0%,100% { transform:translateY(0); }
+      50% { transform:translateY(-3px); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      #page4 .replay-button, #page4 .screenshot-hint { animation:none; }
+    }
+
   </style>
 </head>
 <body>
@@ -223,7 +268,7 @@
         <button class="primary" onclick="showAcceptPopup()">ลองกลับมาคุยกันนะ 💗</button>
         <button class="secondary" id="noButton" type="button" onpointerenter="if (event.pointerType === 'mouse') dodgeNoButton(event)"
         onpointerdown="if (event.pointerType !== 'mouse') dodgeNoButton(event)"
-        onclick="if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) dodgeNoButton(event)" >ขอคิดดูก่อน</button>
+        onclick="if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) dodgeNoButton(event)" >ไม่กลับไปแล้ว</button>
       </div>
     </section>
 
@@ -233,10 +278,12 @@
         <img src="images/end.gif" alt="ภาพเคลื่อนไหว">
         <div class="placeholder">🧸💕</div>
       </div>
-      <h1>ขอบคุณที่อ่านจนจบนะ</h1>
-      <p class="message">ไม่ว่าจะตัดสินใจแบบไหน<br>ก็ขอบคุณที่ให้โอกาสอ่านข้อความนี้</p>
-      <p class="sub">หวังว่าเราจะได้ยิ้มให้กันอีกครั้งนะ</p>
-      <div class="buttons"><button class="secondary" onclick="go(1)">อ่านอีกครั้ง ↻</button></div>
+      <h1>เย้~ ดีใจที่สุดเลย! 🎉</h1>
+      <p class="message">ขอบคุณที่ให้โอกาสกันอีกครั้งนะ<br>ครั้งนี้พี่ไม่ทำให้หนูผิดหวัง 💗</p>
+      <div class="buttons final-actions">
+        <button class="primary replay-button" onclick="go(1)">อ่านอีกครั้ง 💗</button>
+      </div>
+      <div class="screenshot-hint">📸 แคปหน้าจอคำตอบนี้<br>ส่งมาในแชทด้วยนะ</div>
     </section>
     <div class="tiny">made with a little hope ♡</div>
   </main>
