@@ -389,22 +389,36 @@
       dodgeCount++;
 
       btn.classList.add('running');
-      const margin = 14;
-      const maxX = Math.max(margin, window.innerWidth - btn.offsetWidth - margin);
-      const maxY = Math.max(margin, window.innerHeight - btn.offsetHeight - margin);
-      let x, y;
+
+      // ใช้ขนาดพื้นที่แสดงผลจริง และเผื่อขอบเพิ่มเพื่อไม่ให้ปุ่มหลุดจอ
+      const viewport = window.visualViewport;
+      const viewWidth = viewport ? Math.min(document.documentElement.clientWidth, viewport.width) : document.documentElement.clientWidth;
+      const viewHeight = viewport ? Math.min(document.documentElement.clientHeight, viewport.height) : document.documentElement.clientHeight;
+      const margin = 24;
+      const rect = btn.getBoundingClientRect();
+      const buttonWidth = rect.width || btn.offsetWidth;
+      const buttonHeight = rect.height || btn.offsetHeight;
+      const maxX = Math.max(0, viewWidth - buttonWidth - margin);
+      const maxY = Math.max(0, viewHeight - buttonHeight - margin);
+      let x = margin + Math.random() * Math.max(0, maxX - margin);
+      let y = margin + Math.random() * Math.max(0, maxY - margin);
       const oldX = parseFloat(btn.style.left);
       const oldY = parseFloat(btn.style.top);
 
-      for (let i = 0; i < 16; i++) {
-        x = margin + Math.random() * (maxX - margin);
-        y = margin + Math.random() * (maxY - margin);
+      // พยายามเลือกตำแหน่งใหม่ที่ห่างจากจุดเดิม แต่ยังอยู่ในขอบจอเสมอ
+      for (let i = 0; i < 20; i++) {
+        const candidateX = margin + Math.random() * Math.max(0, maxX - margin);
+        const candidateY = margin + Math.random() * Math.max(0, maxY - margin);
+        x = candidateX;
+        y = candidateY;
         if (!Number.isFinite(oldX) || !Number.isFinite(oldY) ||
             Math.hypot(x - oldX, y - oldY) > 120) break;
       }
+      x = Math.max(0, Math.min(x, maxX));
+      y = Math.max(0, Math.min(y, maxY));
       btn.style.left = `${x}px`;
       btn.style.top = `${y}px`;
-      btn.style.transform = `rotate(${Math.random() * 16 - 8}deg)`;
+      btn.style.transform = 'none';
     }
     document.getElementById('envelope').addEventListener('keydown', e => {
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLetter(); }
