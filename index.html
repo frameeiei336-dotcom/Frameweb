@@ -138,6 +138,7 @@
       <h1>อ่านข้อความนี้นะ</h1>
       <p class="message" style="font-size:18px;color:#805d82;font-weight:600">กลับมาได้มั้ยขอโทดที่พูดอะไรไม่คิด มาคุยกันเหมือนเดิมได้มั้ย🥹</p>
       <p class="sub">ถ้าเธอยังพอมีพื้นที่ให้กัน<br>เราอยากกลับมาคุยกันอีกครั้ง</p>
+      <p id="dodgeMessage" class="sub" aria-live="polite" style="display:none;max-width:310px;margin:0 auto 12px;padding:9px 13px;border-radius:18px;background:linear-gradient(120deg,#fff0f6,#edf8ff);color:#9b718f;box-shadow:0 4px 12px rgba(185,145,180,.10)">อ้าว~ ปุ่มมันหนีเองนะ ไม่เกี่ยวกับเราเลย 🙈</p>
       <div class="buttons">
         <button class="primary" onclick="go(4)">ลองกลับมาคุยกันนะ 💗</button>
         <button class="secondary" id="noButton" type="button" onmouseenter="dodgeNoButton()" ontouchstart="dodgeNoButton(event)" onclick="dodgeNoButton(event)">ขอคิดดูก่อน</button>
@@ -177,6 +178,9 @@
       if (n !== 2) {
         opened = false;
         const noBtn = document.getElementById('noButton');
+        dodgeCount = 0;
+        const bubble = document.getElementById('dodgeMessage');
+        if (bubble) { bubble.style.display = 'none'; bubble.textContent = dodgeLines[0]; }
         if (noBtn) {
           noBtn.classList.remove('running');
           noBtn.style.left = '';
@@ -191,15 +195,33 @@
       document.getElementById('envelope').classList.add('open');
       document.getElementById('letterHint').textContent = 'จดหมายเปิดแล้ว แตะอีกครั้งเพื่ออ่านข้อความ 💗';
     }
+    let dodgeCount = 0;
+    const dodgeLines = [
+      "อ้าว~ ปุ่มมันหนีเองนะ ไม่เกี่ยวกับเราเลย 🙈",
+      "แงง ทำไมกดไม่โดนสักทีล่ะ 🥺",
+      "ปุ่มนี้เขาไม่อยากให้เธอกดจริง ๆ นะ 💗",
+      "ลองคิดดูอีกนิดไม่ได้เหรอออ 🥹",
+      "จับเราให้ได้ก่อนสิ แน่จริงก็ลองดู! 😝",
+      "โอ๊ะ! หนีทันอีกแล้ววว 💨",
+      "อย่าเพิ่งยอมแพ้สิ ขออีกครั้งน้าา 🩷",
+      "หรือว่าในใจเธอก็อยากกลับมาเหมือนกันนะ 💞"
+    ];
     function dodgeNoButton(event) {
       if (event) {
         event.preventDefault();
         event.stopPropagation();
       }
       const btn = document.getElementById('noButton');
+      const bubble = document.getElementById('dodgeMessage');
       if (!btn) return;
-      btn.classList.add('running');
 
+      if (bubble) {
+        bubble.style.display = 'block';
+        bubble.textContent = dodgeLines[Math.min(dodgeCount, dodgeLines.length - 1)];
+      }
+      dodgeCount++;
+
+      btn.classList.add('running');
       const margin = 14;
       const maxX = Math.max(margin, window.innerWidth - btn.offsetWidth - margin);
       const maxY = Math.max(margin, window.innerHeight - btn.offsetHeight - margin);
@@ -207,11 +229,11 @@
       const oldX = parseFloat(btn.style.left);
       const oldY = parseFloat(btn.style.top);
 
-      // เลือกตำแหน่งใหม่ที่ห่างจากตำแหน่งเดิม เพื่อให้ปุ่มดูเหมือนวิ่งหนี
-      for (let i = 0; i < 12; i++) {
+      for (let i = 0; i < 16; i++) {
         x = margin + Math.random() * (maxX - margin);
         y = margin + Math.random() * (maxY - margin);
-        if (!Number.isFinite(oldX) || Math.hypot(x - oldX, y - oldY) > 120) break;
+        if (!Number.isFinite(oldX) || !Number.isFinite(oldY) ||
+            Math.hypot(x - oldX, y - oldY) > 120) break;
       }
       btn.style.left = `${x}px`;
       btn.style.top = `${y}px`;
