@@ -82,6 +82,23 @@
     .progress i { width:6px;height:6px;border-radius:50%;background:#ead5e5; }
     .progress i.active { width:19px;border-radius:8px;background:linear-gradient(90deg,#ee9fbd,#91cdec); }
     .hidden { display:none !important; }
+    .modal-backdrop {
+      position:fixed; inset:0; z-index:100; display:grid; place-items:center;
+      padding:20px; background:rgba(87,72,100,.34); backdrop-filter:blur(7px);
+      animation:fadeIn .25s ease both;
+    }
+    .modal-backdrop.hidden { display:none !important; }
+    .modal {
+      width:min(100%,350px); padding:28px 23px 24px; border-radius:27px;
+      background:linear-gradient(145deg,#fffafd,#f2faff); border:2px solid rgba(255,255,255,.95);
+      box-shadow:0 20px 60px rgba(91,73,111,.25); text-align:center;
+      animation:popIn .32s cubic-bezier(.2,.8,.2,1) both;
+    }
+    .modal-emoji { font-size:48px; margin-bottom:8px; }
+    .modal h2 { color:#956d91; font-size:21px; margin:5px 0 10px; }
+    .modal p { color:#917e99; font-size:14px; line-height:1.85; margin:0 0 18px; }
+    @keyframes fadeIn { from {opacity:0} to {opacity:1} }
+    @keyframes popIn { from {opacity:0;transform:translateY(12px) scale(.9)} to {opacity:1;transform:none} }
     .envelope {
       width:150px;height:110px;margin:25px auto 22px;position:relative;
       background:linear-gradient(145deg,#f6b7cf,#e7a8ca);border-radius:10px;
@@ -99,12 +116,69 @@
       border-top:57px solid #fbd9e7;transform-origin:top;transition:transform .45s;
     }
     .envelope.open:after { transform:rotateX(180deg); }
+
+    /* ซองจดหมายลอยขึ้นมาเป็นป๊อปอัป */
+    .envelope-popup .modal { overflow:visible; padding-top:34px; }
+    .envelope-stage { width:190px; height:145px; margin:8px auto 14px; display:grid; place-items:center; }
+    .envelope-popup .envelope {
+      margin:0; transform:translateY(38px) scale(.82); opacity:0;
+      animation:envelopeLift .7s cubic-bezier(.2,.8,.2,1) .08s forwards;
+    }
+    .envelope-popup.shaking .envelope { animation:envelopeLift .7s cubic-bezier(.2,.8,.2,1) .08s forwards, envelopeShake .55s ease-in-out .82s 2; }
+    .envelope-popup.opened .envelope:after { transform:rotateX(180deg); }
+    .envelope-popup.opened .seal { transform:scale(.7); opacity:0; transition:.25s; }
+    .envelope-popup .envelope:after { transition:transform .55s ease; }
+    .envelope-next { opacity:0; transform:translateY(8px); pointer-events:none; transition:.3s; }
+    .envelope-popup.opened .envelope-next { opacity:1; transform:none; pointer-events:auto; }
+    @keyframes envelopeLift { to { transform:translateY(0) scale(1); opacity:1; } }
+    @keyframes envelopeShake {
+      0%,100% { transform:translateX(0) rotate(0); }
+      20% { transform:translateX(-8px) rotate(-5deg); }
+      40% { transform:translateX(8px) rotate(5deg); }
+      60% { transform:translateX(-6px) rotate(-3deg); }
+      80% { transform:translateX(6px) rotate(3deg); }
+    }
     .seal { position:absolute;z-index:2;left:calc(50% - 14px);top:42px;font-size:27px; }
     @media(max-width:380px){.card{padding:24px 18px;min-height:560px}.art{width:165px;height:160px}}
   </style>
 </head>
 <body>
   <div class="floaties" aria-hidden="true"><span>♡</span><span>✦</span><span>♡</span><span>✧</span></div>
+
+  <!-- ป๊อปอัปต้อนรับเมื่อเปิดเว็บไซต์ -->
+  <div id="welcomePopup" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="welcomeTitle">
+    <div class="modal">
+      <div class="modal-emoji">💌</div>
+      <h2 id="welcomeTitle">มีข้อความถึงเธอ</h2>
+      <p>มีบางอย่างอยากบอก<br>ขอเวลาสักนิด เปิดอ่านข้อความนี้ได้ไหม 🥺</p>
+      <button class="primary" onclick="closeWelcomePopup()">เปิดอ่านข้อความ 💗</button>
+    </div>
+  </div>
+
+
+  <!-- ป๊อปอัปซองจดหมายลอยขึ้นมา เขย่า แล้วเปิดออก -->
+  <div id="envelopePopup" class="modal-backdrop hidden envelope-popup shaking" role="dialog" aria-modal="true" aria-label="ซองจดหมาย">
+    <div class="modal">
+      <div class="modal-emoji">💌</div>
+      <h2>มีจดหมายถึงเธอ</h2>
+      <div class="envelope-stage">
+        <div class="envelope" aria-hidden="true"><span class="seal">♡</span></div>
+      </div>
+      <p>มีบางอย่างซ่อนอยู่ในนี้นะ 🥺</p>
+      <button class="primary envelope-next" onclick="continueLetter()">อ่านข้อความข้างใน 💗</button>
+    </div>
+  </div>
+
+  <!-- ป๊อปอัปเมื่อกดปุ่มอยากกลับมาคุยกัน -->
+  <div id="acceptPopup" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="acceptTitle">
+    <div class="modal">
+      <div class="modal-emoji">🥹💗</div>
+      <h2 id="acceptTitle">จริง ๆ นะ...?</h2>
+      <p>ขอบคุณที่ยังให้โอกาสกันนะ<br>เราดีใจมากเลยที่เธอยอมกลับมาคุยกันอีกครั้ง</p>
+      <button class="primary" onclick="finishAcceptPopup()">ตกลง 💞</button>
+    </div>
+  </div>
+
   <main class="card">
     <div class="topline">A LITTLE MESSAGE FOR YOU</div>
     <div class="progress" aria-hidden="true"><i class="active"></i><i></i><i></i></div>
@@ -146,7 +220,7 @@
       <p class="sub">ถ้าเธอยังพอมีพื้นที่ให้กัน<br>เราอยากกลับมาคุยกันอีกครั้ง</p>
       <p id="dodgeMessage" class="sub" aria-live="polite" style="display:none;max-width:310px;margin:0 auto 12px;padding:9px 13px;border-radius:18px;background:linear-gradient(120deg,#fff0f6,#edf8ff);color:#9b718f;box-shadow:0 4px 12px rgba(185,145,180,.10)">อ้าว~ ปุ่มมันหนีเองนะ ไม่เกี่ยวกับเราเลย 🙈</p>
       <div class="buttons">
-        <button class="primary" onclick="go(4)">ลองกลับมาคุยกันนะ 💗</button>
+        <button class="primary" onclick="showAcceptPopup()">ลองกลับมาคุยกันนะ 💗</button>
         <button class="secondary" id="noButton" type="button" onpointerenter="if (event.pointerType === 'mouse') dodgeNoButton(event)"
         onpointerdown="if (event.pointerType !== 'mouse') dodgeNoButton(event)"
         onclick="if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) dodgeNoButton(event)" >ขอคิดดูก่อน</button>
@@ -169,6 +243,16 @@
 
   <script>
     let opened = false;
+    function closeWelcomePopup() {
+      document.getElementById('welcomePopup').classList.add('hidden');
+    }
+    function showAcceptPopup() {
+      document.getElementById('acceptPopup').classList.remove('hidden');
+    }
+    function finishAcceptPopup() {
+      document.getElementById('acceptPopup').classList.add('hidden');
+      go(4);
+    }
     function showGif(section) {
       const img = section.querySelector('.art img');
       if (!img) return;
@@ -198,10 +282,22 @@
       }
     }
     function openLetter() {
-      if (opened) { go(3); return; }
+      if (opened) return;
       opened = true;
+      const popup = document.getElementById('envelopePopup');
+      popup.classList.remove('hidden', 'opened');
+      popup.classList.add('shaking');
+      document.getElementById('letterHint').textContent = 'กำลังเปิดจดหมายให้เธออยู่... 💗';
+      // ให้ซองลอยขึ้นมา เขย่า แล้วค่อย ๆ เปิดฝาซอง
+      window.setTimeout(() => {
+        popup.classList.add('opened');
+        popup.classList.remove('shaking');
+      }, 1450);
+    }
+    function continueLetter() {
+      document.getElementById('envelopePopup').classList.add('hidden');
       document.getElementById('envelope').classList.add('open');
-      document.getElementById('letterHint').textContent = 'จดหมายเปิดแล้ว แตะอีกครั้งเพื่ออ่านข้อความ 💗';
+      go(3);
     }
     let dodgeCount = 0;
     const dodgeLines = [
