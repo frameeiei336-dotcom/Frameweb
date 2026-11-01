@@ -70,6 +70,8 @@
     .primary { background:linear-gradient(110deg,var(--pink-deep),#ed9dbb); }
     .secondary { background:linear-gradient(110deg,var(--blue-deep),#91c9ed); }
     .tiny { font-size:11px; color:#b49eb3; margin-top:25px; }
+    #noButton { position:relative; z-index:5; touch-action:manipulation; }
+    #noButton.running { position:fixed; transition:left .18s ease, top .18s ease, transform .18s ease; }
     .progress { display:flex; justify-content:center; gap:6px; margin:0 0 18px; }
     .progress i { width:6px;height:6px;border-radius:50%;background:#ead5e5; }
     .progress i.active { width:19px;border-radius:8px;background:linear-gradient(90deg,#ee9fbd,#91cdec); }
@@ -138,7 +140,7 @@
       <p class="sub">ถ้าเธอยังพอมีพื้นที่ให้กัน<br>เราอยากกลับมาคุยกันอีกครั้ง</p>
       <div class="buttons">
         <button class="primary" onclick="go(4)">ลองกลับมาคุยกันนะ 💗</button>
-        <button class="secondary" onclick="think()">ขอคิดดูก่อน</button>
+        <button class="secondary" id="noButton" type="button" onmouseenter="dodgeNoButton()" ontouchstart="dodgeNoButton(event)" onclick="dodgeNoButton(event)">ขอคิดดูก่อน</button>
       </div>
     </section>
 
@@ -172,7 +174,16 @@
       current.classList.remove('hidden');
       document.querySelectorAll('.progress i').forEach((dot, i) => dot.classList.toggle('active', i === Math.min(n-1,2)));
       showGif(current);
-      if (n !== 2) opened = false;
+      if (n !== 2) {
+        opened = false;
+        const noBtn = document.getElementById('noButton');
+        if (noBtn) {
+          noBtn.classList.remove('running');
+          noBtn.style.left = '';
+          noBtn.style.top = '';
+          noBtn.style.transform = '';
+        }
+      }
     }
     function openLetter() {
       if (opened) { go(3); return; }
@@ -180,10 +191,31 @@
       document.getElementById('envelope').classList.add('open');
       document.getElementById('letterHint').textContent = 'จดหมายเปิดแล้ว แตะอีกครั้งเพื่ออ่านข้อความ 💗';
     }
-    function think() {
-      const btn = document.querySelector('#page3 .secondary');
-      btn.textContent = 'ไม่เป็นไร ค่อย ๆ คิดนะ';
-      btn.style.transform = 'translateY(-2px)';
+    function dodgeNoButton(event) {
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+      const btn = document.getElementById('noButton');
+      if (!btn) return;
+      btn.classList.add('running');
+
+      const margin = 14;
+      const maxX = Math.max(margin, window.innerWidth - btn.offsetWidth - margin);
+      const maxY = Math.max(margin, window.innerHeight - btn.offsetHeight - margin);
+      let x, y;
+      const oldX = parseFloat(btn.style.left);
+      const oldY = parseFloat(btn.style.top);
+
+      // เลือกตำแหน่งใหม่ที่ห่างจากตำแหน่งเดิม เพื่อให้ปุ่มดูเหมือนวิ่งหนี
+      for (let i = 0; i < 12; i++) {
+        x = margin + Math.random() * (maxX - margin);
+        y = margin + Math.random() * (maxY - margin);
+        if (!Number.isFinite(oldX) || Math.hypot(x - oldX, y - oldY) > 120) break;
+      }
+      btn.style.left = `${x}px`;
+      btn.style.top = `${y}px`;
+      btn.style.transform = `rotate(${Math.random() * 16 - 8}deg)`;
     }
     document.getElementById('envelope').addEventListener('keydown', e => {
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLetter(); }
