@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#07172b">
+<title>ลอยไปด้วยกันกับเฟรม 🌙</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#ffe0a0;--glass:#0b1d35d9;--line:#ffffff26}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:#fff6e5;font-family:Kanit,sans-serif;background:radial-gradient(ellipse at 50% -10%,#354b78 0,#172b4b 40%,#061326 100%);overflow-x:hidden}
+.sky{position:fixed;inset:0;pointer-events:none;background-image:radial-gradient(2px 2px at 9% 18%,#fff 50%,transparent 60%),radial-gradient(1px 1px at 28% 35%,#fff 50%,transparent 60%),radial-gradient(2px 2px at 76% 15%,#ffe8b0 50%,transparent 60%),radial-gradient(1px 1px at 90% 44%,#fff 50%,transparent 60%),radial-gradient(1px 1px at 60% 28%,#fff 50%,transparent 60%);opacity:.8}
+header{text-align:center;padding:32px 16px 10px;position:relative}
+.moon{width:76px;height:76px;border-radius:50%;margin:0 auto 12px;background:#fff0c8;box-shadow:0 0 30px #ffe5a088,0 0 95px #ffe5a044}
+h1{margin:0;color:var(--gold);font-size:clamp(2rem,8vw,3.2rem);font-weight:600;text-shadow:0 3px 25px #ffd37a55}
+.sub{margin:4px 0 0;color:#cbd9eb;font-weight:300}
+.panel{position:relative;width:min(92%,570px);margin:18px auto;padding:18px;border:1px solid var(--line);border-radius:22px;background:var(--glass);backdrop-filter:blur(12px);box-shadow:0 18px 50px #0005}
+label{display:block;margin:0 0 7px;color:var(--gold);font-size:.94rem}
+input,select{width:100%;padding:12px 13px;border:1px solid #ffffff30;border-radius:12px;background:#102844;color:white;font:inherit;outline:none}
+input:focus,select:focus{border-color:#ffe0a0}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}
+.avatars{display:flex;gap:8px;flex-wrap:wrap}
+.avatar{width:42px;height:42px;border-radius:12px;border:1px solid #ffffff30;background:#102844;font-size:23px;cursor:pointer;display:grid;place-items:center}
+.avatar.active{border:2px solid var(--gold);background:#5c4b35}
+button{font:600 1rem Kanit,sans-serif;cursor:pointer}
+#floatBtn{width:100%;border:0;border-radius:14px;padding:13px;margin-top:16px;color:#38240a;background:linear-gradient(135deg,#ffedb8,#e8ae5b);box-shadow:0 8px 24px #e8ad5540}
+.note{font-size:.8rem;line-height:1.5;color:#aebfd4;margin:10px 2px 0}
+.river-area{position:relative;height:440px;margin-top:8px;overflow:hidden;background:linear-gradient(#0a1b3100,#0a4760a8 25%,#052d49 100%)}
+.river{position:absolute;inset:90px -12% -40px;border-radius:50% 50% 0 0/13% 13% 0 0;background:repeating-linear-gradient(174deg,transparent 0 17px,#a4e8ef20 18px 20px,transparent 21px 38px),linear-gradient(#15556d,#062b47 80%);box-shadow:0 -15px 55px #63d8e522}
+.river:before,.river:after{content:"";position:absolute;left:-5%;width:110%;height:75px;border-top:2px solid #9be8ee25;border-radius:50%}
+.river:before{top:35px}.river:after{top:115px;transform:translateX(30px)}
+.water-label{position:absolute;top:28px;left:0;right:0;text-align:center;color:#d9e7f4;font-size:.9rem}
+.water{position:absolute;inset:0;z-index:2}
+.floaty{position:absolute;display:flex;align-items:center;flex-direction:column;gap:1px;transform:translate(-50%,-50%);animation:drift 6s ease-in-out infinite alternate;cursor:pointer;filter:drop-shadow(0 0 10px #ffc85b66);max-width:125px}
+.floaty .face{font-size:27px;line-height:1.15}
+.floaty .boat{font-size:31px;line-height:1.1}
+.floaty .name{max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:2px 8px;border-radius:20px;font-size:11px;color:#fff3d2;background:#061a2ddd;border:1px solid #ffe4a555}
+.floaty.frame .face{font-size:32px}.floaty.frame .boat{font-size:38px}
+@keyframes drift{from{transform:translate(-50%,-50%) translateX(-9px) rotate(-3deg)}to{transform:translate(-50%,-50%) translateX(10px) rotate(3deg)}}
+.status{text-align:center;color:#c5d6e8;font-size:.88rem;margin:12px 0 0}
+footer{text-align:center;color:#8ca2bd;font-size:.78rem;padding:8px 14px 26px}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);z-index:5;display:none;max-width:90%;padding:11px 16px;border:1px solid #ffffff30;border-radius:12px;background:#102743;text-align:center;box-shadow:0 8px 30px #0007}
+.clear{display:block;margin:12px auto 0;background:none;border:1px solid #ffffff35;color:#c6d5e7;border-radius:10px;padding:7px 13px;font-size:.8rem}
+@media(max-width:440px){.grid{grid-template-columns:1fr}.panel{padding:15px}.river-area{height:410px}}
+</style>
+</head>
+<body>
+<div class="sky"></div>
+<header>
+  <div class="moon"></div>
+  <h1>ลอยไปด้วยกันกับเฟรม</h1>
+  <p class="sub">คืนวันเพ็ญนี้ มาฝากคำอธิษฐานไว้บนสายน้ำกัน 🌕</p>
+</header>
+
+<section class="panel">
+  <label for="guestName">ชื่อเจ้าของกระทง</label>
+  <input id="guestName" maxlength="22" placeholder="พิมพ์ชื่อของคุณ...">
+  <div class="grid">
+    <div>
+      <label>เลือกตัวละครของคุณ</label>
+      <div class="avatars" id="avatars">
+        <button class="avatar active" data-avatar="🐱" aria-label="แมว">🐱</button>
+        <button class="avatar" data-avatar="🐰" aria-label="กระต่าย">🐰</button>
+        <button class="avatar" data-avatar="🐻" aria-label="หมี">🐻</button>
+        <button class="avatar" data-avatar="🐼" aria-label="แพนด้า">🐼</button>
+        <button class="avatar" data-avatar="🐸" aria-label="กบ">🐸</button>
+        <button class="avatar" data-avatar="🦊" aria-label="จิ้งจอก">🦊</button>
+        <button class="avatar" data-avatar="🐷" aria-label="หมู">🐷</button>
+        <button class="avatar" data-avatar="🐣" aria-label="ลูกเจี๊ยบ">🐣</button>
+      </div>
+    </div>
+    <div>
+      <label for="krathong">เลือกกระทง</label>
+      <select id="krathong">
+        <option value="🪷">ดอกบัว</option><option value="🌸">ดอกไม้ชมพู</option>
+        <option value="🌼">ดาวเรือง</option><option value="🪷✨">แสงทอง</option>
+      </select>
+    </div>
+  </div>
+  <div style="margin-top:13px">
+    <label for="wish">คำอธิษฐานของคุณ</label>
+    <input id="wish" maxlength="100" placeholder="ขอให้ปีนี้มีแต่เรื่องดี ๆ ...">
+  </div>
+  <button id="floatBtn">🪷 ลอยกระทงไปพร้อมกับเฟรม</button>
+  <p class="note">เมื่อกดลอย ตัวละครและกระทงของคุณจะปรากฏข้างกระทงของเฟรม แตะที่กระทงเพื่ออ่านข้อความอธิษฐาน</p>
+</section>
+
+<p class="status" id="status">คืนนี้มีคนมาลอยกระทงด้วยกัน 1 คน</p>
+<section class="river-area">
+  <div class="water-label">สายน้ำแห่งคำอธิษฐาน ✨</div>
+  <div class="river"></div>
+  <div class="water" id="water"></div>
+</section>
+<footer>ขอให้คำอธิษฐานของทุกคนลอยไปถึงสิ่งดี ๆ 💛<br>สร้างด้วยความตั้งใจจากเฟรม</footer>
+<div class="toast" id="toast"></div>
+<script>
+const water=document.getElementById('water');
+const statusLine=document.getElementById('status');
+const toast=document.getElementById('toast');
+const KEY='frame-loy-krathong-v1';
+let chosen='🐱';
+let guests=[];
+function say(t){toast.textContent=t;toast.style.display='block';clearTimeout(say.timer);say.timer=setTimeout(()=>toast.style.display='none',3000)}
+document.querySelectorAll('.avatar').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.avatar').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');chosen=b.dataset.avatar;
+}));
+function addFloat(item,index,isFrame=false){
+  const el=document.createElement('div');
+  el.className='floaty'+(isFrame?' frame':'');
+  const x=isFrame?50:10+((index*23+13)%80);
+  const y=isFrame?43:54+((index*17)%36);
+  el.style.left=x+'%';el.style.top=y+'%';el.style.animationDelay=(-index*.7)+'s';
+  const face=document.createElement('div');face.className='face';face.textContent=item.avatar;
+  const boat=document.createElement('div');boat.className='boat';boat.textContent=item.krathong;
+  const name=document.createElement('div');name.className='name';name.textContent=item.name;
+  el.append(face,boat,name);
+  el.addEventListener('click',()=>say(item.name+(item.wish?' : '+item.wish:' (ขอให้สมหวังนะ 💛)')));
+  water.appendChild(el);
+}
+function render(){
+  water.innerHTML='';
+  addFloat({avatar:'🌙',krathong:'🪷✨',name:'เฟรม',wish:'ขอให้ทุกคนมีความสุข'},0,true);
+  guests.forEach((g,i)=>addFloat(g,i+1));
+  statusLine.textContent=`คืนนี้มีคนมาลอยกระทงด้วยกัน ${guests.length+1} คน`;
+}
+try{guests=JSON.parse(localStorage.getItem(KEY)||'[]');if(!Array.isArray(guests))guests=[];}catch(e){guests=[]}
+render();
+document.getElementById('floatBtn').addEventListener('click',()=>{
+  const name=document.getElementById('guestName').value.trim();
+  const wish=document.getElementById('wish').value.trim();
+  if(!name){say('ใส่ชื่อเจ้าของกระทงก่อนนะ');document.getElementById('guestName').focus();return}
+  guests.push({name,avatar:chosen,krathong:document.getElementById('krathong').value,wish,at:Date.now()});
+  try{localStorage.setItem(KEY,JSON.stringify(guests));}catch(e){}
+  render();
+  document.getElementById('guestName').value='';
+  document.getElementById('wish').value='';
+  say('กระทงของคุณลอยไปพร้อมกับเฟรมแล้ว 🪷');
+});
+</script>
+</body>
+</html>
